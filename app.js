@@ -13,7 +13,13 @@
 
 
 
-// Step 1 - Create classes and objects for EarthShip and AlienFleet
+// CREATE PLAYER CLASSES
+// Extraneous functions
+
+const randomNum = (min, max) => {
+    return Math.round(min + Math.random()*(max-min));
+}
+
 class EarthShip {
     constructor(name, hull, firepower, accuracy){
         this.name = name;
@@ -22,7 +28,11 @@ class EarthShip {
         this.accuracy = accuracy;
     }
     attack() {
-        return this.firepower;  
+        if (Math.random() > accuracy) {
+            return this.firepower;
+        } else {
+            return 'miss';
+        }
     }
 }
 
@@ -34,12 +44,16 @@ class AlienShip {
         this.accuracy = randomNum(6,8)/10;
     }
     attack() {
-        return this.firepower;
+        if (Math.random() > accuracy) {
+            return this.firepower;
+        } else {
+            return 'miss';
+        }
     }
 }
 
 class AlienFleet {
-    constructor(fleetSize) {
+    constructor(fleetSize = 6) {
         this.fleetSize = fleetSize;
         this.fleet = [];
         for(let i = 0; i < this.fleetSize; i++){
@@ -54,20 +68,66 @@ class AlienFleet {
 }
 
 
-const earthShip = new EarthShip('USS Assembly', 20, 5, .7);
-console.table(earthShip)
+// CREATE GAME CLASS
+class Game {
+    constructor(){
 
-const alienFleet = new AlienFleet(6);
-console.table(alienFleet);
+        // INSTANTIATE PLAYERS
+        this.alienFleet = new AlienFleet(6);
+        this.earthShip = new EarthShip('UPRW Assembly', 20, 5, .7);
+        console.log('%c spacebattle\n', 'font-size: 40px');
+        console.log(`Earth is under attack from a fleet of ${this.alienFleet.fleetSize} alien warships! As a last line of defense, the United Peoples Republic of the World has sent the ${this.earthShip.name} into space to fight the alien onslaught...`);
+        this.result = undefined;
+        this.gameOver = false;
+
+        // START THE GAME
+        let alienShipId = 0;
+        while(!this.gameOver) {
+            this.playRound();
+            // User attacks first alien ship
+            // Alien attack user (DISPLAY IN CONSOLE)
+            // Users attacks alien - alien health falls below 0 (DISPLAY IN CONSOLE)
+            // ALERT user they have defeated the first alien AND PROMPT to fight again, or flee (User fight)
+            // User selects fight again and repeat
+            // (IF) User selectes flee:
+                // result = flee
+            // (IF)
+        }
+
+        // DISPLAY RESULTS
+        this.displayGameResult(this.result);
+    }
+
+    playRound(){
+        this.displayTurn();
+        this.checkWin();
+    }
+
+    displayTurn(attacker, defender){
+        console.log(`Displaying Turn!`);
+    }
 
 
+    promptNextRound(){
+    }
 
+    checkWin(){
+        this.gameOver = true;
+        this.result = 'flee';
+    }
+    
+    displayGameResult(result){
+        if(result === 'win'){
+            console.log(`--------------------\n\n GAME OVER\n${this.earthShip.name} defeated the Alien Horde! The world is saved!!`)
+        } else if(result === 'lose'){
+            console.log(`--------------------\n\n GAME OVER\n${this.earthShip.name} was destroyed by the Alien Horde! Earth's destruction is imminent...`);
+        } else if(result === 'flee'){
+            console.log(`--------------------\n\n GAME OVER\n${this.earthShip.name} fled the battle, saving those on board, but sacrificing the Earth... Earth's destruction is imminent.`);
+        } else {
+            console.log(`--------------------\n\n GAME OVER\nWhoops! Look like something went wrong and the winner can't be displayed.`)
+        }
+    }
 
-
-
-
-
-
-const randomNum = (min, max) => {
-    return (Math.round((min + Math.random() * (max-min))));
 }
+
+const game = new Game();
