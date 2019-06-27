@@ -53,7 +53,7 @@ class AlienShip {
 }
 
 class AlienFleet {
-    constructor(fleetSize = 20) {
+    constructor(fleetSize = 10) {
         this.fleetSize = fleetSize;
         this.fleet = [];
         for(let i = 0; i < this.fleetSize; i++){
@@ -75,7 +75,7 @@ class Game {
         this.alienFleet = new AlienFleet();
         this.earthShip = new EarthShip('UPRW Assembly', 20, 5, .7);
         console.log('%c spacebattle\n', 'font-size: 40px');
-        console.log(`Earth is under attack from a fleet of ${this.alienFleet.fleetSize} alien warships! As a last line of defense, the United Peoples Republic of the World has sent the ${this.earthShip.name} into space to fight the alien onslaught...`);
+        console.log(`%c Earth is under attack from a fleet of ${this.alienFleet.fleetSize} alien warships! As a last line of defense, the United Peoples Republic of the World has sent the ${this.earthShip.name} into space to fight the alien onslaught...\n`, 'line-height: 1.5');
         this.result = undefined;
         this.gameOver = false;
         this.alienId = 0;
@@ -117,11 +117,13 @@ class Game {
     displayTurn(earthAttack, alienAttack, alienId){
         let earthSentence = '';
         let alienSentence = '';
+        let style = ``;
         if(earthAttack !== 0 && this.alienFleet.fleet[alienId].hull !== 0){
             earthSentence = `${this.earthShip.name} hit the alien ship! The attack caused ${earthAttack} damage points. The alien hull health is at ${this.alienFleet.fleet[alienId].hull}.`;
         }
         else if(earthAttack !== 0 && this.alienFleet.fleet[alienId].hull === 0){
             earthSentence =`${this.earthShip.name} hit alien ship ${alienId+1} and the alien ship exploded!`;
+            style = `color: lightblue`;
         }
         else if(earthAttack === 0){
             earthSentence = `${this.earthShip.name}'s attack missed. The alien hull health is at ${this.alienFleet.fleet[alienId].hull}.`;
@@ -130,13 +132,14 @@ class Game {
             alienSentence = `Alien ship ${alienId+1} hit the ${this.earthShip.name}. The attack caused ${alienAttack} damage points. The ${this.earthShip.name}'s hull health is at ${this.earthShip.hull}.`;
         } else if(alienAttack !== 0 && alienAttack !== null && this.earthShip.hull === 0){
             alienSentence = `Alien ship ${alienId+1} hit the ${this.earthShip.name} and it exploded!`
+            style = `color: red`;
         }
         else if(alienAttack === 0){
             alienSentence = `Alien ship ${alienId+1}'s attack missed. The ${this.earthShip.name}'s hull health is at ${this.earthShip.hull}.`;
         } else if(alienAttack === null) {
             alienSentence = '';
         }
-        console.log(earthSentence + '\n' + alienSentence);
+        console.log('%c ' + earthSentence + '\n' + alienSentence, style);
         return;
     }
 
@@ -176,13 +179,16 @@ class Game {
 
     displayGameResult(result){
         if(result === 'win'){
-            console.log(`--------------------\n\n GAME OVER\n${this.earthShip.name} defeated the alien horde! The world is saved!!`)
+            console.log(`--------------------\n\n GAME OVER\n\n--------------------`);
+            console.log(`%c${this.earthShip.name} defeated the alien horde! The world is saved!!`, 'color: green')
         } else if(result === 'lose'){
-            console.log(`--------------------\n\n GAME OVER\n${this.earthShip.name} was destroyed by the alien horde! Earth's destruction is imminent...`);
+            console.log(`--------------------\n\n GAME OVER\n\n--------------------`)
+            console.log(`%c${this.earthShip.name} was destroyed by the alien horde! Earth's destruction is imminent...`, 'color: red');
         } else if(result === 'flee'){
-            console.log(`--------------------\n\n GAME OVER\n${this.earthShip.name} fled the battle, saving those on board, but sacrificing the Earth... Earth's destruction is imminent.`);
+            console.log(`--------------------\n\n GAME OVER\n\n--------------------${this.earthShip.name} fled the battle, saving those on board, but sacrificing the Earth... Earth's destruction is imminent.`, 'color: red');
         } else {
-            console.log(`--------------------\n\n GAME OVER\nWhoops! Look like something went wrong and the winner can't be displayed.`)
+            console.log(`--------------------\n\n GAME OVER\n\n--------------------`);
+            console.log(`Whoops! Look like something went wrong and the winner can't be displayed.`)
         }
         return;
     }
