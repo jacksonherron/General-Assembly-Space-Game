@@ -12,10 +12,10 @@
     // You lose the game if you are destroyed.
 
 
-
 // CREATE PLAYER CLASSES
 // Extraneous functions
 
+/*
 const randomNum = (min, max) => {
     return Math.round(min + Math.random()*(max-min));
 }
@@ -197,3 +197,116 @@ class Game {
 }
 
 const game = new Game();
+*/
+
+
+
+
+
+
+// REPEAT THE EXCERCISE AS A CODE ALONG
+
+// Create Ship class!!
+class Ship {
+    constructor(shipConfig) {
+        this.name = shipConfig.name;
+        this.hull = shipConfig.hull;
+        this.firePower = shipConfig.firePower;
+        this.accuracy = shipConfig.accuracy;
+    }
+
+    static randomNumber(min, max, isDecimal){
+        if(isDecimal){
+            return parseFloat((min + Math.random()*(max-min)).toFixed(1));
+        } else{
+            return Math.floor(Math.random() * (max - min) + min);
+        }
+    }
+
+    static getRandomAlienConfig(alienId) {
+        return {
+            name: alienId,
+            hull : Ship.randomNumber(3,6),
+            firePower: Ship.randomNumber(2,4),
+            accuracy: Ship.randomNumber(.6, .8, true),
+        }
+    }
+}
+
+
+// Create Game class!!
+class Game {
+    constructor(numberOfAliens) {
+        this.numberOfAliens = numberOfAliens;
+        this.ships = {
+            ussAssembly: new Ship({
+                name: 'USS Assembly',
+                hull: 20,
+                firePower: 5,
+                accuracy: .7
+            }),
+            aliens: [],
+            alien: {},
+        }
+    }
+
+    selectAlienTarget() {
+        return this.ships.aliens.shift();
+    }
+
+    attack(operator, mark) {
+        if (Math.random() < operator.accuracy) {
+            mark.hull -= operator.firePower;
+            return `Direct hit!`;
+        } else {
+            return 'Miss...';
+        }
+    }
+
+    battle() {
+        let {alien, ussAssembly} = this.ships;
+
+        while(alien && ussAssembly.hull > 0 ){
+            let operator = ussAssembly;
+            let mark = alien;
+            console.log('Attack...!');
+            const result = this.attack(operator, mark);
+            console.log(result);
+            console.log(`Alien ${mark.name + 1} ship hull = ${mark.hull}`);
+            if (mark.hull > 0) {
+                operator = alien;
+                mark = ussAssembly;
+                console.log(`Alien ${operator.name + 1} count-attacks ${mark.name}`);
+                const result = this.attack(operator, mark);
+                console.log(result);
+                console.log(`${mark.name} ship hull = ${mark.hull}`);
+
+            } else {
+                console.log(`${operator.name} destroyed Alien ${mark.name+1}`);
+                alien = this.selectAlienTarget();
+                alien ? console.log(`New Alien target selected...`): null;
+            }
+        }
+        if (this.ships.ussAssembly.hull > 0) {
+            console.log(`VICTORY!! You defeated all ${this.numberOfAliens} Aliens!`);
+        } else {
+            console.log(`DEFEAT. ${this.ships.ussAssembly.name} exploded! Earth's destruction is imminent...`);
+        }
+    }
+
+    init() {
+        console.log('...Initializing game...');
+        for(let i = 0; i < this.numberOfAliens; i++ ){
+            let alien = new Ship(Ship.getRandomAlienConfig(i));
+            this.ships.aliens.push(alien);
+        }
+        this.ships.alien = this.selectAlienTarget();
+        console.log('First alien target sighted...');
+        this.battle();
+
+    }
+}
+
+const game = new Game(20);
+game.init();
+
