@@ -39,7 +39,7 @@ class EarthShip {
 class AlienShip {
     constructor(id){
         this.id = id;
-        this.hull = randomNum(3,6)
+        this.hull = randomNum(3,6);
         this.firepower = randomNum(2,4);
         this.accuracy = randomNum(6,8)/10;
     }
@@ -53,7 +53,7 @@ class AlienShip {
 }
 
 class AlienFleet {
-    constructor(fleetSize = 6) {
+    constructor(fleetSize = 20) {
         this.fleetSize = fleetSize;
         this.fleet = [];
         for(let i = 0; i < this.fleetSize; i++){
@@ -90,40 +90,51 @@ class Game {
     // GAME FUNCTIONS
     playRound(){
         let alienId = this.alienId;
+        let alienAttack = null;
         // PLAYER ATTACKS
         let earthAttack = this.earthShip.attack();
         this.alienFleet.fleet[alienId].hull -= earthAttack;
         this.checkWin();
         if (this.gameOver === true) {
+            this.displayTurn(earthAttack, alienAttack, alienId);
             return;
         }
+        if(this.alienFleet.fleet[alienId].hull > 0){
         // ALIEN ATTACKS
-        let alienAttack = this.alienFleet.fleet[alienId].attack();
-        this.earthShip.hull -= alienAttack;
-        this.checkWin();
-        if (this.gameOver === true) {
-            return;
+            alienAttack = this.alienFleet.fleet[alienId].attack();
+            this.earthShip.hull -= alienAttack;
+            this.checkWin();
+            if (this.gameOver === true) {
+                this.displayTurn(earthAttack, alienAttack, alienId);
+                return;
+            }
         }
-
         this.displayTurn(earthAttack, alienAttack, alienId);
-        return;
+        return
 
     }
 
     displayTurn(earthAttack, alienAttack, alienId){
         let earthSentence = '';
         let alienSentence = '';
-        if(earthAttack !== 0){
+        if(earthAttack !== 0 && this.alienFleet.fleet[alienId].hull !== 0){
             earthSentence = `${this.earthShip.name} hit the alien ship! The attack caused ${earthAttack} damage points. The alien hull health is at ${this.alienFleet.fleet[alienId].hull}.`;
+        }
+        else if(earthAttack !== 0 && this.alienFleet.fleet[alienId].hull === 0){
+            earthSentence =`${this.earthShip.name} hit alien ship ${alienId+1} and the alien ship exploded!`;
         }
         else if(earthAttack === 0){
             earthSentence = `${this.earthShip.name}'s attack missed. The alien hull health is at ${this.alienFleet.fleet[alienId].hull}.`;
         }
-        if (alienAttack !== 0){
-            alienSentence = `Alien ship ${alienId} hit the ${this.earthShip.name}. The attack caused ${alienAttack}dammage points. The ${this.earthShip.name}'s hull health is at ${this.earthShip.hull}.`;
+        if (alienAttack !== 0 && alienAttack !== null && this.earthShip.hull !== 0){
+            alienSentence = `Alien ship ${alienId+1} hit the ${this.earthShip.name}. The attack caused ${alienAttack} damage points. The ${this.earthShip.name}'s hull health is at ${this.earthShip.hull}.`;
+        } else if(alienAttack !== 0 && alienAttack !== null && this.earthShip.hull === 0){
+            alienSentence = `Alien ship ${alienId+1} hit the ${this.earthShip.name} and it exploded!`
         }
         else if(alienAttack === 0){
-            alienSentence = `Alien ship ${alienId}'s attack missed. The ${this.earthShip.name}'s hull health is at ${this.earthShip.hull}.`;
+            alienSentence = `Alien ship ${alienId+1}'s attack missed. The ${this.earthShip.name}'s hull health is at ${this.earthShip.hull}.`;
+        } else if(alienAttack === null) {
+            alienSentence = '';
         }
         console.log(earthSentence + '\n' + alienSentence);
         return;
@@ -142,9 +153,8 @@ class Game {
         }
     
     checkWin(){
-        if(this.alienFleet.fleet[this.alienId].hull < 0){
+        if(this.alienFleet.fleet[this.alienId].hull <= 0){
             this.alienFleet.fleet[this.alienId].hull = 0;
-            console.log(`Alien ship number ${this.alienId} was defeated!`);
             this.alienId += 1;
             if(this.alienId < this.alienFleet.fleetSize){
                 this.promptNextRound();
@@ -157,17 +167,18 @@ class Game {
         }
         if(this.earthShip.hull < 0){
             this.earthShip.hull = 0;
-            console.log(`${this.earthShip.name} exploded!`);
             this.result = 'lose';
             this.gameOver = true;
-            return
+            return;
         }
+        return;
     }
+
     displayGameResult(result){
         if(result === 'win'){
-            console.log(`--------------------\n\n GAME OVER\n${this.earthShip.name} defeated the Alien Horde! The world is saved!!`)
+            console.log(`--------------------\n\n GAME OVER\n${this.earthShip.name} defeated the alien horde! The world is saved!!`)
         } else if(result === 'lose'){
-            console.log(`--------------------\n\n GAME OVER\n${this.earthShip.name} was destroyed by the Alien Horde! Earth's destruction is imminent...`);
+            console.log(`--------------------\n\n GAME OVER\n${this.earthShip.name} was destroyed by the alien horde! Earth's destruction is imminent...`);
         } else if(result === 'flee'){
             console.log(`--------------------\n\n GAME OVER\n${this.earthShip.name} fled the battle, saving those on board, but sacrificing the Earth... Earth's destruction is imminent.`);
         } else {
